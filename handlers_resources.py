@@ -10,7 +10,7 @@ from schemas import (
 from handlers_connection import resolve_client
 
 @chat.function("list_vault_items", "List vault_items in LastPass Enterprise.", action_type="read", chain_callable=True, event="lastpass-connector.list_vault_items", effects=["read:vault_items"], data_model=VaultItemList)
-async def list_vault_items(params: ListVaultItemParams, ctx) -> ActionResult:
+async def list_vault_items(ctx, params: ListVaultItemParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         raw_items = await client.list_vault_items(limit=params.limit)
@@ -24,7 +24,7 @@ async def list_vault_items(params: ListVaultItemParams, ctx) -> ActionResult:
         return ActionResult.error(f"Error listing vault_items: {e}")
 
 @chat.function("get_vaultitem", "Get details of one VaultItem in LastPass Enterprise.", action_type="read", chain_callable=True, event="lastpass-connector.get_vaultitem", effects=["read:vaultitem"], data_model=VaultItemRecord)
-async def get_vaultitem(params: GetVaultItemParams, ctx) -> ActionResult:
+async def get_vaultitem(ctx, params: GetVaultItemParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         r = await client.get_vaultitem(params.vaultitem_id)
@@ -35,7 +35,7 @@ async def get_vaultitem(params: GetVaultItemParams, ctx) -> ActionResult:
         return ActionResult.error(f"Error retrieving VaultItem: {e}")
 
 @chat.function("audit_vaultitem_health", "Audit health of LastPass Enterprise vault_items and connectivity.", action_type="read", chain_callable=True, event="lastpass-connector.audit_vaultitem_health", effects=["read:audit"], data_model=AuditHealthReport)
-async def audit_vaultitem_health(params: ConnectionIdParams, ctx) -> ActionResult:
+async def audit_vaultitem_health(ctx, params: ConnectionIdParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         items = await client.list_vault_items(limit=50)
