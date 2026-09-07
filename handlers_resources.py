@@ -19,7 +19,7 @@ async def list_vault_items(params: ListVaultItemParams, ctx) -> ActionResult:
             rid = str(r.get("id") or r.get("key") or r.get("uuid") or "unknown")
             rname = r.get("name") or r.get("title") or r.get("label") or rid
             items.append({"id": rid, "name": rname, "status": r.get("status"), "created_at": r.get("createdAt") or r.get("created_at"), "raw": r})
-        return ActionResult.ok({"vault_items": items, "total": len(items)}, summary=f"Found {len(items)} vault_items.")
+        return ActionResult.success({"vault_items": items, "total": len(items)}, summary=f"Found {len(items)} vault_items.")
     except Exception as e:
         return ActionResult.error(f"Error listing vault_items: {e}")
 
@@ -30,7 +30,7 @@ async def get_vaultitem(params: GetVaultItemParams, ctx) -> ActionResult:
         r = await client.get_vaultitem(params.vaultitem_id)
         rid = str(r.get("id") or params.vaultitem_id)
         rname = r.get("name") or r.get("title") or rid
-        return ActionResult.ok({"id": rid, "name": rname, "status": r.get("status"), "created_at": r.get("createdAt") or r.get("created_at"), "raw": r}, summary=f"Retrieved VaultItem {rid}.")
+        return ActionResult.success({"id": rid, "name": rname, "status": r.get("status"), "created_at": r.get("createdAt") or r.get("created_at"), "raw": r}, summary=f"Retrieved VaultItem {rid}.")
     except Exception as e:
         return ActionResult.error(f"Error retrieving VaultItem: {e}")
 
@@ -39,7 +39,7 @@ async def audit_vaultitem_health(params: ConnectionIdParams, ctx) -> ActionResul
     client = await resolve_client(ctx, params.connection_id)
     try:
         items = await client.list_vault_items(limit=50)
-        return ActionResult.ok({
+        return ActionResult.success({
             "healthy": True,
             "total_vault_items": len(items),
             "details": {"sample_count": len(items)},
